@@ -175,6 +175,7 @@ func (s *Server) discoveryHandler() (http.HandlerFunc, error) {
 		Claims: []string{
 			"aud", "email", "email_verified", "exp",
 			"iat", "iss", "locale", "name", "sub",
+			"preferred_username",
 		},
 	}
 
@@ -479,11 +480,12 @@ func (s *Server) handleConnectorCallback(w http.ResponseWriter, r *http.Request)
 // the approval page's path.
 func (s *Server) finalizeLogin(identity connector.Identity, authReq storage.AuthRequest, conn connector.Connector) (string, error) {
 	claims := storage.Claims{
-		UserID:        identity.UserID,
-		Username:      identity.Username,
-		Email:         identity.Email,
-		EmailVerified: identity.EmailVerified,
-		Groups:        identity.Groups,
+		UserID:            identity.UserID,
+		Username:          identity.Username,
+		PreferredUsername: identity.PreferredUsername,
+		Email:             identity.Email,
+		EmailVerified:     identity.EmailVerified,
+		Groups:            identity.Groups,
 	}
 
 	updater := func(a storage.AuthRequest) (storage.AuthRequest, error) {
@@ -501,8 +503,8 @@ func (s *Server) finalizeLogin(identity connector.Identity, authReq storage.Auth
 		email = email + " (unverified)"
 	}
 
-	s.logger.Infof("login successful: connector %q, username=%q, email=%q, groups=%q",
-		authReq.ConnectorID, claims.Username, email, claims.Groups)
+	s.logger.Infof("login successful: connector %q, username=%q, preferred_username=%q, email=%q, groups=%q",
+		authReq.ConnectorID, claims.Username, claims.PreferredUsername, claims.Email, claims.Groups)
 
 	return path.Join(s.issuerURL.Path, "/approval") + "?req=" + authReq.ID, nil
 }
@@ -992,11 +994,12 @@ func (s *Server) handleRefreshToken(w http.ResponseWriter, r *http.Request, clie
 	}
 
 	claims := storage.Claims{
-		UserID:        ident.UserID,
-		Username:      ident.Username,
-		Email:         ident.Email,
-		EmailVerified: ident.EmailVerified,
-		Groups:        ident.Groups,
+		UserID:            ident.UserID,
+		Username:          ident.Username,
+		PreferredUsername: ident.PreferredUsername,
+		Email:             ident.Email,
+		EmailVerified:     ident.EmailVerified,
+		Groups:            ident.Groups,
 	}
 
 	accessToken, err := s.newAccessToken(client.ID, claims, scopes, refresh.Nonce, refresh.ConnectorID)
