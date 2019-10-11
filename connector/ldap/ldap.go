@@ -389,6 +389,10 @@ func (c *ldapConnector) userEntry(conn *ldap.Conn, username string) (user ldap.E
 		req.Attributes = append(req.Attributes, c.UserSearch.NameAttr)
 	}
 
+	if c.UserSearch.PreferredUsernameAttrAttr != "" {
+		req.Attributes = append(req.Attributes, c.UserSearch.PreferredUsernameAttrAttr)
+	}
+
 	c.logger.Infof("performing ldap search %s %s %s",
 		req.BaseDN, scopeString(req.Scope), req.Filter)
 	resp, err := conn.Search(req)
