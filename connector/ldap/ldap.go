@@ -39,7 +39,7 @@ import (
 //         idAttr: uid
 //         emailAttr: mail
 //         nameAttr: name
-//		   preferredUsernameAttr: uid
+//         preferredUsernameAttr: uid
 //       groupSearch:
 //         # Would translate to the query "(&(objectClass=group)(member=<user uid>))"
 //         baseDN: cn=groups,dc=example,dc=com
